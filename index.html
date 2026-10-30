@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Relève</title>
+  
+  <!-- Configuration PWA & iOS -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- Feuille de style principale -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Conteneur principal de l'application (Encapsulé en mode smartphone sur PC) -->
+  <main id="app-container" style="padding: 20px; padding-bottom: 90px; flex: 1; overflow-y: auto;">
+    
+    <!-- ================= 1. VUE DASHBOARD (ACCUEIL) ================= -->
+    <section id="view-dashboard" class="view-screen">
+      <h1 style="font-size: 24px; margin-bottom: 4px;">Bonjour Thomas 👋</h1>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;">Votre relève commence ici.</p>
+      
+      <!-- Carte Salaire Net Estimé (Mis à jour dynamiquement) -->
+      <div class="glass-card">
+        <p style="color: var(--text-secondary); font-size: 11px; letter-spacing: 0.5px;">SALAIRE ESTIMÉ (OCTOBRE)</p>
+        <h2 id="dash-salary" style="font-size: 32px; margin: 8px 0;">2 486 €</h2>
+        <p id="dash-hours" style="font-size: 12px; color: var(--accent-amber);">152h / 169h effectuées</p>
+      </div>
+
+      <!-- Carte Prochaine Garde -->
+      <div class="glass-card">
+        <p style="color: var(--text-secondary); font-size: 11px; margin-bottom: 6px;">PROCHAINE GARDE</p>
+        <h3 style="font-size: 16px;">Garde de Jour</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">07:00 - 19:00 • Base Lumi-Gal</p>
+      </div>
+    </section>
+
+    <!-- ================= 2. VUE PLANNING ================= -->
+    <section id="view-planning" class="view-screen" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h1 style="font-size: 24px;">Mon planning</h1>
+        <span style="font-size: 13px; color: var(--text-secondary);">Octobre 2026</span>
+      </div>
+
+      <!-- Grille du Calendrier -->
+      <div class="glass-card">
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; font-size: 11px; color: var(--text-secondary); margin-bottom: 12px;">
+          <div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center;">
+          <div class="day-badge day-off">1</div>
+          <div class="day-badge day-shift">2</div>
+          <div class="day-badge day-shift">3</div>
+          <div class="day-badge night-shift">4</div>
+          <div class="day-badge night-shift">5</div>
+          <div class="day-badge day-off">6</div>
+          <div class="day-badge day-off">7</div>
+          <div class="day-badge day-shift">8</div>
+          <div class="day-badge day-shift">9</div>
+          <div class="day-badge night-shift">10</div>
+          <div class="day-badge night-shift">11</div>
+          <div class="day-badge day-off">12</div>
+          <div class="day-badge day-shift">13</div>
+          <div class="day-badge day-shift">14</div>
+          <div class="day-badge day-shift">15</div>
+          <div class="day-badge night-shift">16</div>
+          <div class="day-badge night-shift">17</div>
+          <div class="day-badge day-off">18</div>
+          <div class="day-badge day-off">19</div>
+          <div class="day-badge day-shift">20</div>
+          <div class="day-badge day-shift">21</div>
+          <div class="day-badge night-shift">22</div>
+          <div class="day-badge night-shift">23</div>
+          <div class="day-badge day-off">24</div>
+          <div class="day-badge day-off">25</div>
+          <div class="day-badge day-shift">26</div>
+          <div class="day-badge day-shift">27</div>
+          <div class="day-badge day-shift active-day">28</div>
+          <div class="day-badge night-shift">29</div>
+          <div class="day-badge night-shift">30</div>
+          <div class="day-badge day-off">31</div>
+        </div>
+      </div>
+
+      <!-- Liste dynamique des gardes enregistrées -->
+      <div class="glass-card" style="margin-top: 16px;">
+        <h3 style="font-size: 15px; margin-bottom: 12px;">Gardes enregistrées</h3>
+        <div id="shifts-list-container" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Injecté dynamiquement par le script JS -->
+        </div>
+      </div>
+
+      <!-- Bouton Flottant (+) pour l'ouverture du formulaire d'ajout -->
+      <button class="fab-btn" onclick="openModal()">+</button>
+    </section>
+
+    <!-- ================= 3. VUE RÉMUNÉRATION & SIMULATEUR ================= -->
+    <section id="view-paie" class="view-screen" style="display: none;">
+      <h1 style="font-size: 24px; margin-bottom: 4px;">Ma rémunération</h1>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;">Détail calculé selon vos gardes du mois.</p>
+      
+      <!-- Carte Récapitulatif Salaire -->
+      <div class="glass-card">
+        <p style="color: var(--text-secondary); font-size: 11px; letter-spacing: 0.5px;">TOTAL NET ESTIMÉ</p>
+        <h2 id="paie-salary" style="font-size: 32px; margin: 8px 0; color: var(--accent-blue);">2 486 €</h2>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); border-top: 1px solid var(--surface-border); padding-top: 10px; margin-top: 10px;">
+          <span id="paie-total-hours">Heures total : 0h</span>
+          <span id="paie-night-count">0 garde(s) de nuit</span>
+        </div>
+      </div>
+
+      <!-- Détail des compteurs métiers -->
+      <div class="glass-card">
+        <h3 style="font-size: 15px; margin-bottom: 12px;">Ventilation des gardes</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Gardes de Jour (12h) :</span>
+            <strong id="paie-day-shifts">0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Gardes de Nuit (12h) :</span>
+            <strong id="paie-night-shifts">0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--surface-border); padding-top: 8px; margin-top: 4px;">
+            <span>Majorations estimées :</span>
+            <strong id="paie-maj-amount" style="color: var(--accent-amber);">0 €</strong>
+          </div>
+        </div>
+
+        <!-- Bouton d'export / copie pour les RH -->
+        <button onclick="copyRHSummary()" style="width: 100%; margin-top: 16px; padding: 12px; background: rgba(0, 122, 255, 0.15); border: 1px solid var(--accent-blue); color: var(--accent-blue); border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer;">
+          📋 Copier le récapitulatif pour les RH
+        </button>
+      </div>
+
+      <!-- Simulateur interactif de gardes supplémentaires -->
+      <div class="glass-card">
+        <h3 style="font-size: 15px; margin-bottom: 8px;">Simulateur de gardes de nuit</h3>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">Et si je prenais des gardes en plus ce mois-ci ?</p>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 13px;">Gardes de nuit supp. :</span>
+          <span id="slider-value" style="font-weight: bold; color: var(--accent-amber);">2 gardes</span>
+        </div>
+        
+        <input type="range" id="night-slider" min="0" max="8" value="2" style="width: 100%; accent-color: var(--accent-amber); cursor: pointer;" oninput="updateSimulation(this.value)">
+        
+        <div style="margin-top: 14px; background: rgba(255, 149, 0, 0.1); border: 1px solid rgba(255, 149, 0, 0.3); border-radius: 8px; padding: 10px; text-align: center;">
+          <span style="font-size: 12px; color: var(--text-secondary);">Gain estimé supplémentaire : </span>
+          <strong id="simulation-gain" style="font-size: 14px; color: var(--accent-amber);">+ 320 € net</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 4. VUE PROFIL & GAMIFICATION ================= -->
+    <section id="view-profil" class="view-screen" style="display: none;">
+      <h1 style="font-size: 24px; margin-bottom: 16px;">Mon profil</h1>
+      
+      <!-- Profil & Barre XP -->
+      <div class="glass-card">
+        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), #5856d6); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">
+            TM
+          </div>
+          <div>
+            <h3 style="font-size: 17px;">Thomas Martin</h3>
+            <p style="font-size: 12px; color: var(--accent-amber); font-weight: 600;">AmbuLegend • Niveau 14</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-bottom: 6px;">
+            <span>Progression Niveau 15</span>
+            <span>2 450 / 3 000 XP</span>
+          </div>
+          <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
+            <div style="width: 81%; height: 100%; background: var(--accent-amber); border-radius: 4px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div class="glass-card">
+        <h3 style="font-size: 15px; margin-bottom: 12px;">Badges & Hauts faits</h3>
+        <div style="display: flex; justify-content: space-between; text-align: center;">
+          <div style="flex: 1;">
+            <div style="font-size: 24px; margin-bottom: 4px;">🌙</div>
+            <p style="font-size: 11px; font-weight: 600;">Hibou de nuit</p>
+          </div>
+          <div style="flex: 1;">
+            <div style="font-size: 24px; margin-bottom: 4px;">🚑</div>
+            <p style="font-size: 11px; font-weight: 600;">As du SAMU</p>
+          </div>
+          <div style="flex: 1;">
+            <div style="font-size: 24px; margin-bottom: 4px;">⚡</div>
+            <p style="font-size: 11px; font-weight: 600;">Toujours prêt</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODALE D'AJOUT DE GARDE ================= -->
+  <div id="shift-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 1000; justify-content: center; align-items: flex-end;">
+    <div style="background: #141414; border: 1px solid var(--surface-border); border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 24px; width: 100%; max-width: 500px; box-sizing: border-box;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-size: 18px;">Ajouter une garde</h2>
+        <button onclick="closeModal()" style="background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <form id="shift-form" onsubmit="saveNewShift(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Date du jour (Octobre)</label>
+          <input type="number" id="shift-day" min="1" max="31" value="28" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--surface-border); border-radius: 8px; color: white; font-size: 14px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Type de garde</label>
+          <select id="shift-type" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--surface-border); border-radius: 8px; color: white; font-size: 14px; box-sizing: border-box;">
+            <option value="day" style="background: #141414;">Garde de Jour (12h - Ambre)</option>
+            <option value="night" style="background: #141414;">Garde de Nuit (12h - Violet)</option>
+            <option value="off" style="background: #141414;">Repos / OFF</option>
+          </select>
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 14px; background: var(--accent-blue); color: white; border: none; border-radius: var(--radius-btn, 12px); font-weight: 600; font-size: 15px; cursor: pointer;">
+          Enregistrer la garde
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= BARRE DE NAVIGATION BASSE ================= -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchView('dashboard', this)">
+      <span>📊</span>
+      <span>Accueil</span>
+    </button>
+    <button class="nav-item" onclick="switchView('planning', this)">
+      <span>📅</span>
+      <span>Planning</span>
+    </button>
+    <button class="nav-item" onclick="switchView('paie', this)">
+      <span>💰</span>
+      <span>Paie</span>
+    </button>
+    <button class="nav-item" onclick="switchView('profil', this)">
+      <span>👤</span>
+      <span>Profil</span>
+    </button>
+  </nav>
+
+  <!-- ================= SCRIPTS JAVASCRIPT & LOGIQUE MÉTIER ================= -->
+  <script>
+    // Chargement de l'état local sauvegardé dans le navigateur
+    let userShifts = JSON.parse(localStorage.getItem('releve_shifts')) || { 28: 'day' };
+
+    /**
+     * Change la vue active lors du clic sur le menu bas
+     */
+    function switchView(viewName, element) {
+      document.querySelectorAll('.view-screen').forEach(screen => {
+        screen.style.display = 'none';
+      });
+      document.getElementById('view-' + viewName).style.display = 'block';
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      element.classList.add('active');
+    }
+
+    /**
+     * Gestion de la fenêtre modale d'ajout de garde
+     */
+    function openModal() {
+      document.getElementById('shift-modal').style.display = 'flex';
+    }
+    function closeModal() {
+      document.getElementById('shift-modal').style.display = 'none';
+    }
+
+    /**
+     * Enregistre une nouvelle garde et met à jour le LocalStorage
+     */
+    function saveNewShift(event) {
+      event.preventDefault();
+      const day = document.getElementById('shift-day').value;
+      const type = document.getElementById('shift-type').value;
+
+      userShifts[day] = type;
+      localStorage.setItem('releve_shifts', JSON.stringify(userShifts));
+
+      closeModal();
+      updateAppStats();
+    }
+
+    /**
+     * Supprime une garde spécifique de la mémoire
+     */
+    function deleteShift(day) {
+      delete userShifts[day];
+      localStorage.setItem('releve_shifts', JSON.stringify(userShifts));
+      updateAppStats();
+    }
+
+    /**
+     * Recalcule les heures, le salaire estimé et rafraîchit toute l'interface
+     */
+    function updateAppStats() {
+      let totalHours = 140; // Base de départ mensuelle
+      let dayCount = 0;
+      let nightCount = 0;
+      let listContainer = document.getElementById('shifts-list-container');
+      if (listContainer) listContainer.innerHTML = '';
+
+      const daysKeys = Object.keys(userShifts);
+
+      if (daysKeys.length === 0 && listContainer) {
+        listContainer.innerHTML = '<p style="font-size: 13px; color: var(--text-secondary);">Aucune garde enregistrée.</p>';
+      } else {
+        daysKeys.forEach(day => {
+          let type = userShifts[day];
+          if (type === 'day') {
+            totalHours += 12;
+            dayCount++;
+          }
+          if (type === 'night') {
+            totalHours += 12;
+            nightCount++;
+          }
+
+          let typeLabel = type === 'day' ? 'Garde de Jour (12h)' : (type === 'night' ? 'Garde de Nuit (12h)' : 'Repos / OFF');
+          let badgeColor = type === 'day' ? 'var(--accent-amber)' : (type === 'night' ? 'var(--accent-night)' : 'var(--text-secondary)');
+
+          if (listContainer) {
+            listContainer.innerHTML += `
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 13px;">
+                <div>
+                  <strong>Octobre ${day}</strong> • <span style="color: ${badgeColor};">${typeLabel}</span>
+                </div>
+                <button onclick="deleteShift('${day}')" style="background: none; border: none; color: #ff453a; cursor: pointer; font-size: 14px;">🗑️</button>
+              </div>
+            `;
+          }
+        });
+      }
+
+      // Calcul financier estimé
+      const estimatedSalary = 1800 + (totalHours * 6) + (nightCount * 50);
+      const majAmount = (nightCount * 50) + ((totalHours - 152 > 0 ? totalHours - 152 : 0) * 15);
+
+      // Mise à jour sur l'écran Dashboard
+      document.getElementById('dash-salary').innerText = estimatedSalary + ' €';
+      document.getElementById('dash-hours').innerText = totalHours + 'h / 169h effectuées';
+
+      // Mise à jour sur l'écran Paie
+      document.getElementById('paie-salary').innerText = estimatedSalary + ' €';
+      document.getElementById('paie-total-hours').innerText = 'Heures total : ' + totalHours + 'h';
+      document.getElementById('paie-night-count').innerText = nightCount + ' garde(s) de nuit';
+      document.getElementById('paie-day-shifts').innerText = dayCount;
+      document.getElementById('paie-night-shifts').innerText = nightCount;
+      document.getElementById('paie-maj-amount').innerText = majAmount + ' €';
+    }
+
+    /**
+     * Copie un récapitulatif texte des heures dans le presse-papier pour les RH
+     */
+    function copyRHSummary() {
+      let totalH = document.getElementById('paie-total-hours').innerText;
+      let salary = document.getElementById('paie-salary').innerText;
+      let days = document.getElementById('paie-day-shifts').innerText;
+      let nights = document.getElementById('paie-night-shifts').innerText;
+
+      let textToCopy = `RECAPITULATIF HEURES - OCTOBRE 2026\n-----------------------------------\n- ${totalH}\n- Gardes de jour : ${days}\n- Gardes de nuit : ${nights}\n- Salaire net estimé : ${salary}\n\nTransmis via l'application Relève.`;
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        alert('Récapitulatif copié dans le presse-papier ! 📋 Vous pouvez le coller à vos RH.');
+      }).catch(err => {
+        console.error('Erreur lors de la copie : ', err);
+      });
+    }
+
+    /**
+     * Met à jour le gain estimé sur le simulateur de paie
+     */
+    function updateSimulation(val) {
+      document.getElementById('slider-value').innerText = val + ' garde' + (val > 2 ? 's' : (val > 1 ? 's' : ''));
+      const gainNet = val * 160;
+      document.getElementById('simulation-gain').innerText = '+ ' + gainNet + ' € net';
+    }
+
+    // Initialisation au chargement de la page
+    window.onload = function() {
+      updateAppStats();
+    };
+
+    // Enregistrement automatique du Service Worker PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('Service Worker enregistré !', reg.scope))
+          .catch(err => console.error('Erreur Service Worker :', err));
+      });
+    }
+  </script>
+</body>
+</html>

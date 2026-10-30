@@ -1,0 +1,274 @@
+/* ==========================================================================
+   1. VARIABLES & DESIGN SYSTEM (UI/UX Ultime - Relève)
+   ========================================================================== */
+:root {
+  --bg-color: #09090b;
+  --surface-color: rgba(255, 255, 255, 0.03);
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --surface-hover: rgba(255, 255, 255, 0.06);
+  
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  
+  --accent-blue: #007aff;
+  --accent-blue-glow: rgba(0, 122, 255, 0.35);
+  --accent-amber: #ff9500;
+  --accent-amber-glow: rgba(255, 149, 0, 0.3);
+  --accent-night: #5856d6;
+  
+  --font-family: -apple-system, BlinkMacSystemFont, 'Inter', Roboto, sans-serif;
+  --radius-card: 22px;
+  --radius-badge: 12px;
+  --radius-btn: 14px;
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ==========================================================================
+   2. RÉINITIALISATION & CADRE MOBILE SUR PC
+   ========================================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  background-color: #030305;
+  color: var(--text-primary);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Cadre Smartphone sur PC / Plein écran sur Mobile */
+#app-container, body > main {
+  width: 100%;
+  max-width: 420px;
+  height: 100%;
+  max-height: 880px;
+  background-color: var(--bg-color);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+  box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+@media (min-width: 481px) {
+  body {
+    background: radial-gradient(circle at center, #18181b 0%, #030305 100%);
+  }
+  #app-container, body > main {
+    border-radius: 40px;
+  }
+}
+
+/* Scrollbar ultra-discrète */
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   3. ANIMATIONS ET TRANSITIONS D'ÉCRANS (MICRO-INTERACTIONS)
+   ========================================================================== */
+.view-screen {
+  animation: fadeInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   4. COMPOSANTS GLASSMORPHISM & HOVER
+   ========================================================================== */
+.glass-card {
+  background: var(--surface-color);
+  border: 1px solid var(--surface-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.4);
+  transition: var(--transition-smooth);
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   5. NAVIGATION BASSE & EFFETS LUMINEUX
+   ========================================================================== */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: rgba(10, 10, 13, 0.85);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-top: 1px solid var(--surface-border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+.bottom-nav button.nav-item {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-secondary);
+  font-size: 11px;
+  transition: var(--transition-smooth);
+  gap: 4px;
+  position: relative;
+}
+
+.bottom-nav button.nav-item span:first-child {
+  transition: transform 0.2s ease;
+}
+
+.bottom-nav button.nav-item:active span:first-child {
+  transform: scale(0.85);
+}
+
+.bottom-nav button.nav-item.active {
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+/* Indicateur lumineux subtil sous l'icône active */
+.bottom-nav button.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 16px;
+  height: 3px;
+  background: var(--accent-blue);
+  border-radius: 3px;
+  box-shadow: 0 0 10px var(--accent-blue-glow);
+}
+
+/* ==========================================================================
+   6. CALENDRIER & PASTILLES MÉTIERS
+   ========================================================================== */
+.day-badge {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-badge);
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  transition: var(--transition-smooth);
+}
+
+.day-badge:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.day-badge.day-shift {
+  background: var(--accent-amber-glow);
+  color: #ffb340;
+  border-color: rgba(255, 149, 0, 0.3);
+}
+
+.day-badge.night-shift {
+  background: rgba(88, 86, 214, 0.22);
+  color: #c2c0ff;
+  border-color: rgba(88, 86, 214, 0.35);
+}
+
+.day-badge.active-day {
+  border: 2px solid var(--text-primary);
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================================================
+   7. BOUTON FLOTTANT D'ACTION (FAB +) & MODALE ANIMÉE
+   ========================================================================== */
+.fab-btn {
+  position: absolute;
+  bottom: 88px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-blue), #0056b3);
+  color: #ffffff;
+  border: none;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px var(--accent-blue-glow);
+  cursor: pointer;
+  z-index: 90;
+  transition: var(--transition-smooth);
+}
+
+.fab-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 14px 30px var(--accent-blue-glow);
+}
+
+.fab-btn:active {
+  transform: scale(0.92);
+}
+
+/* Animation d'ouverture de la modale */
+#shift-modal {
+  animation: fadeInOverlay 0.25s ease forwards;
+}
+
+#shift-modal > div {
+  animation: slideUpModal 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInOverlay {
+  from { background: rgba(0,0,0,0); }
+  to { background: rgba(0,0,0,0.8); }
+}
+
+@keyframes slideUpModal {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
