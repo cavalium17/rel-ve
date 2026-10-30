@@ -48,7 +48,7 @@ body {
 }
 
 /* Cadre Smartphone sur PC / Plein écran sur Mobile */
-#app-container, body > main {
+#app-container {
   width: 100%;
   max-width: 420px;
   height: 100%;
@@ -59,13 +59,15 @@ body {
   position: relative;
   overflow-y: auto;
   box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  padding-bottom: 90px; /* Espace réservé pour la barre de navigation basse */
 }
 
 @media (min-width: 481px) {
   body {
     background: radial-gradient(circle at center, #18181b 0%, #030305 100%);
   }
-  #app-container, body > main {
+  #app-container {
     border-radius: 40px;
   }
 }
@@ -101,7 +103,7 @@ body {
 }
 
 /* ==========================================================================
-   4. COMPOSANTS GLASSMORPHISM & HOVER
+   4. COMPOSANTS GLASSMORPHISM & BENTO GRID
    ========================================================================== */
 .glass-card {
   background: var(--surface-color);
@@ -109,7 +111,7 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-card);
-  padding: 20px;
+  padding: 18px;
   margin-bottom: 14px;
   box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.4);
   transition: var(--transition-smooth);
@@ -121,8 +123,77 @@ body {
   box-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.5);
 }
 
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.bento-span-2 {
+  grid-column: span 2;
+}
+
+.revolut-card {
+  background: radial-gradient(circle at top left, rgba(0, 122, 255, 0.15) 0%, rgba(255, 255, 255, 0.02) 70%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
 /* ==========================================================================
-   5. NAVIGATION BASSE & EFFETS LUMINEUX
+   5. ÉLÉMENTS GRAPHIQUES (ICÔNES & PASTILLES STYLISÉES)
+   ========================================================================== */
+.icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--surface-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+}
+
+.icon-amber {
+  background: rgba(255, 149, 0, 0.12);
+  color: var(--accent-amber);
+  border-color: rgba(255, 149, 0, 0.25);
+}
+
+.icon-purple {
+  background: rgba(88, 86, 214, 0.15);
+  color: #a2a0ff;
+  border-color: rgba(88, 86, 214, 0.3);
+}
+
+.pill-tag {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.pill-blue {
+  background: rgba(0, 122, 255, 0.18);
+  color: #3395ff;
+  border: 1px solid rgba(0, 122, 255, 0.3);
+}
+
+.pill-amber {
+  background: rgba(255, 149, 0, 0.18);
+  color: #ffb340;
+  border: 1px solid rgba(255, 149, 0, 0.3);
+}
+
+.pill-purple {
+  background: rgba(88, 86, 214, 0.2);
+  color: #c2c0ff;
+  border: 1px solid rgba(88, 86, 214, 0.35);
+}
+
+/* ==========================================================================
+   6. NAVIGATION BASSE & EFFETS LUMINEUX
    ========================================================================== */
 .bottom-nav {
   position: absolute;
@@ -158,20 +229,11 @@ body {
   position: relative;
 }
 
-.bottom-nav button.nav-item span:first-child {
-  transition: transform 0.2s ease;
-}
-
-.bottom-nav button.nav-item:active span:first-child {
-  transform: scale(0.85);
-}
-
 .bottom-nav button.nav-item.active {
   color: var(--accent-blue);
   font-weight: 600;
 }
 
-/* Indicateur lumineux subtil sous l'icône active */
 .bottom-nav button.nav-item.active::after {
   content: '';
   position: absolute;
@@ -184,46 +246,7 @@ body {
 }
 
 /* ==========================================================================
-   6. CALENDRIER & PASTILLES MÉTIERS
-   ========================================================================== */
-.day-badge {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-badge);
-  font-size: 12px;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-secondary);
-  border: 1px solid transparent;
-  transition: var(--transition-smooth);
-}
-
-.day-badge:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.day-badge.day-shift {
-  background: var(--accent-amber-glow);
-  color: #ffb340;
-  border-color: rgba(255, 149, 0, 0.3);
-}
-
-.day-badge.night-shift {
-  background: rgba(88, 86, 214, 0.22);
-  color: #c2c0ff;
-  border-color: rgba(88, 86, 214, 0.35);
-}
-
-.day-badge.active-day {
-  border: 2px solid var(--text-primary);
-  font-weight: bold;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-}
-
-/* ==========================================================================
-   7. BOUTON FLOTTANT D'ACTION (FAB +) & MODALE ANIMÉE
+   7. BOUTON FLOTTANT (FAB +) & CALENDRIER
    ========================================================================== */
 .fab-btn {
   position: absolute;
@@ -247,28 +270,34 @@ body {
 
 .fab-btn:hover {
   transform: scale(1.06);
-  box-shadow: 0 14px 30px var(--accent-blue-glow);
 }
 
 .fab-btn:active {
   transform: scale(0.92);
 }
 
-/* Animation d'ouverture de la modale */
-#shift-modal {
-  animation: fadeInOverlay 0.25s ease forwards;
+.day-badge {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-badge);
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  transition: var(--transition-smooth);
 }
 
-#shift-modal > div {
-  animation: slideUpModal 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.day-badge.day-shift {
+  background: var(--accent-amber-glow);
+  color: #ffb340;
+  border-color: rgba(255, 149, 0, 0.3);
 }
 
-@keyframes fadeInOverlay {
-  from { background: rgba(0,0,0,0); }
-  to { background: rgba(0,0,0,0.8); }
-}
-
-@keyframes slideUpModal {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+.day-badge.night-shift {
+  background: rgba(88, 86, 214, 0.22);
+  color: #c2c0ff;
+  border-color: rgba(88, 86, 214, 0.35);
 }
